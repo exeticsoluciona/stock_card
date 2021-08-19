@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server 13.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-08-19 06:28+0000\n"
-"PO-Revision-Date: 2021-08-19 00:34-0600\n"
+"PO-Revision-Date: 2021-08-19 14:58-0600\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -148,7 +148,7 @@ msgstr "Última actualización el"
 #: model:ir.model.fields,field_description:stock_card_report.field_stock_card_view__location_id
 #: model_terms:ir.ui.view,arch_db:stock_card_report.report_stock_card_report_filters
 msgid "Location"
-msgstr "Ubicación origen"
+msgstr "Ubicación"
 
 #. module: stock_card_report
 #: model:ir.model.fields,field_description:stock_card_report.field_stock_card_view__location_dest_id

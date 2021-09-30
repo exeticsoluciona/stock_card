@@ -13,7 +13,7 @@
                     </group>
                     <group>
                         <field name="product_ids" widget="many2many_tags" />
-                        <field name="location_id" />
+                        <field name="location_id" domain="[('location_id','!=','WH/Stock')]" />
                     </group>
                 </group>
                 <footer>

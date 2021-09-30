@@ -29,7 +29,7 @@
             <div class="row">
                 <div class="col-6 custom_footer">
                     <span
-                        t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d')"
+                        t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"
                     />
                 </div>
                 <div class="col-6 text-right custom_footer">
@@ -123,10 +123,12 @@
             </div>
             <div class="act_as_row">
                 <div class="act_as_cell">
-                    <span t-field="o.date_from" />
+                    <span t-esc="o.date_from.strftime('%d/%m/%Y')"/>
+                    <!--<span t-field="o.date_from" t-field-options='{"format": "dd/MM/yyyy"}'/>-->
                 </div>
                 <div class="act_as_cell">
-                    <span t-field="o.date_to" />
+                    <!--<span t-field="o.date_to" t-field-options='{"format": "dd/MM/yyyy"}'/>-->
+                    <span t-esc="o.date_to.strftime('%d/%m/%Y')"/>
                 </div>
                 <div class="act_as_cell">
                     <span t-field="o.location_id" />
@@ -150,7 +152,7 @@
     <template id="stock_card_report.report_stock_card_lines">
         <div class="act_as_row lines">
             <div class="act_as_cell left">
-                <t t-esc="product_line.date.strftime('%Y-%m-%d')" />
+                <t t-esc="product_line.date.strftime('%d-%m-%Y')" />
             </div>
             <div class="act_as_cell left">
                 <t t-esc="product_line.reference" />

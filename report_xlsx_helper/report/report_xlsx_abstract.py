@@ -109,7 +109,7 @@ class ReportXlsxAbstract(models.AbstractModel):
         pct_format_conditional = "{0};[Red]-{0};{0}".format(pct_format)
         int_format = "#,##0"
         int_format_conditional = "{0};[Red]-{0};{0}".format(int_format)
-        date_format = "YYYY-MM-DD"
+        date_format = "DD-MM-YYYY"
         theader_yellow = dict(theader, bg_color=bg_yellow)
         theader_blue = dict(theader, bg_color=bg_blue)
 

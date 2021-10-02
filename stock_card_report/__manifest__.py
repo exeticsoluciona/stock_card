@@ -7,7 +7,7 @@
     "version": "13.0.1.0.0",
     "category": "Warehouse",
     "website": "https://www.exeticsoluciona.com",
-    "author": "Ecosoft, Odoo Community Association (OCA)",
+    "author": "Ecosoft, Odoo Community Association",
     "Mainteiner": "Exetic Soluciona, Ingenieria y Soluciones GT",
     "license": "AGPL-3",
     "depends": ["stock", "date_range", "report_xlsx_helper"],

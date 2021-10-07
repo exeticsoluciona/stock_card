@@ -71,7 +71,7 @@
         <t t-foreach="o.product_ids" t-as="product">
             <div class="page">
                 <div class="row">
-                    <t t-set="title">Stock Card - <t t-raw="product.name" /></t>
+                    <t t-set="title">Reporte de Kardex - <t t-raw="product.name" /></t>
                     <h4 class="mt0" t-esc="title" style="text-align: center;" />
                 </div>
                 <!-- Display filters -->
@@ -88,8 +88,9 @@
                     <div class="act_as_row lines">
                         <div class="act_as_cell" />
                         <div class="act_as_cell">
-                            Initial
+                            Saldo Inicial
                         </div>
+                        <div class="act_as_cell" />
                         <div class="act_as_cell" />
                         <div class="act_as_cell" />
                         <div class="act_as_cell right">
@@ -142,6 +143,7 @@
             <div class="act_as_row labels">
                 <div class="act_as_cell">Fecha</div>
                 <div class="act_as_cell">Referencia</div>
+                <div class="act_as_cell">Precio de Costo</div>
                 <div class="act_as_cell">Entradas</div>
                 <div class="act_as_cell">Salidas</div>
                 <div class="act_as_cell">Saldo</div>
@@ -158,13 +160,16 @@
                 <t t-esc="product_line.reference" />
             </div>
             <div class="act_as_cell right">
-                <t t-esc="'{0:,.3f}'.format(product_line.product_in)" />
+                <t t-esc="'{0:,.2f}'.format(o._get_nearest_standard_price(product,product_line.date))" />
             </div>
             <div class="act_as_cell right">
-                <t t-esc="'{0:,.3f}'.format(product_line.product_out)" />
+                <t t-esc="'{0:,.2f}'.format(product_line.product_in)" />
             </div>
             <div class="act_as_cell right">
-                <t t-esc="'{0:,.3f}'.format(product_balance)" />
+                <t t-esc="'{0:,.2f}'.format(product_line.product_out)" />
+            </div>
+            <div class="act_as_cell right">
+                <t t-esc="'{0:,.2f}'.format(product_balance)" />
             </div>
         </div>
    </template>

@@ -49,8 +49,8 @@ class ReportStockCardReportXlsx(models.AbstractModel):
         }
         initial_template = {
             "1_ref": {
-                "data": {"value": "Initial", "format": self.format_tcell_center},
-                "colspan": 4,
+                "data": {"value": "Saldo Inicial", "format": self.format_tcell_center},
+                "colspan": 5,
             },
             "2_balance": {
                 "data": {
@@ -64,9 +64,9 @@ class ReportStockCardReportXlsx(models.AbstractModel):
                 "header": {"value": "Fecha"},
                 "data": {
                     "value": self._render("date"),
-                    "format": self.format_tcell_date_left,
+                    "format": self.format_tcell_date_center,
                 },
-                "width": 25,
+                "width": 15,
             },
             "2_reference": {
                 "header": {"value": "Referencia"},
@@ -74,29 +74,36 @@ class ReportStockCardReportXlsx(models.AbstractModel):
                     "value": self._render("reference"),
                     "format": self.format_tcell_left,
                 },
-                "width": 25,
+                "width": 40,
             },
-            "3_input": {
+            "3_cost": {
+                "header": {"value": "Precio de costo"},
+                "data": {
+                    "value": self._render("nearest_standard_price"),
+                },
+                "width": 15,
+            },
+            "4_input": {
                 "header": {"value": "Entradas"},
                 "data": {"value": self._render("input")},
-                "width": 25,
+                "width": 15,
             },
-            "4_output": {
+            "5_output": {
                 "header": {"value": "Salidas"},
                 "data": {"value": self._render("output")},
-                "width": 25,
+                "width": 15,
             },
-            "5_balance": {
+            "6_balance": {
                 "header": {"value": "Saldo"},
                 "data": {"value": self._render("balance")},
-                "width": 25,
+                "width": 15,
             },
         }
 
         ws_params = {
             "ws_name": product.name,
             "generate_ws_method": "_stock_card_report",
-            "title": "Stock Card - {}".format(product.name),
+            "title": "Reporte de Kardex - {}".format(product.name),
             "wanted_list_filter": [k for k in sorted(filter_template.keys())],
             "col_specs_filter": filter_template,
             "wanted_list_initial": [k for k in sorted(initial_template.keys())],
@@ -165,6 +172,7 @@ class ReportStockCardReportXlsx(models.AbstractModel):
         )
         for line in product_lines:
             balance += line.product_in - line.product_out
+            nearest_standard_price = objects._get_nearest_standard_price(line.product_id, line.date)
             row_pos = self._write_line(
                 ws,
                 row_pos,
@@ -173,6 +181,7 @@ class ReportStockCardReportXlsx(models.AbstractModel):
                 render_space={
                     "date": line.date or "",
                     "reference": line.reference or "",
+                    "nearest_standard_price": nearest_standard_price,
                     "input": line.product_in or 0,
                     "output": line.product_out or 0,
                     "balance": balance,

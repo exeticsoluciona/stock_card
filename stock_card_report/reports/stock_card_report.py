@@ -76,10 +76,30 @@ class StockCardReport(models.TransientModel):
         ReportLine = self.env["stock.card.view"]
         self.results = [ReportLine.new(line).id for line in stock_card_results]
 
+
     def _get_initial(self, product_line):
         product_input_qty = sum(product_line.mapped("product_in"))
         product_output_qty = sum(product_line.mapped("product_out"))
         return product_input_qty - product_output_qty
+
+    def _get_nearest_standard_price(self,product_line,date_field):
+        layer_ids = self.env['stock.valuation.layer'].search([('create_date', '>=', date_field.date()),('create_date', '<=', date_field.date()),('product_id','=',product_line.id)])
+        if layer_ids:
+            date_items = []
+            nearest_date = False
+            for layer in layer_ids:
+                date_items.append(layer.create_date)
+            #find nearest value
+            cloz_dict = {
+                abs(date_field.timestamp() - date.timestamp()): date
+                for date in date_items}
+            nearest_date = cloz_dict[min(cloz_dict.keys())]
+            print("Nearest date from list : " + str(nearest_date))
+            if nearest_date:
+                for layer in layer_ids:
+                    if layer.create_date == nearest_date:
+                        return layer.unit_cost
+        return product_line.standard_price
 
     def print_report(self, report_type="qweb"):
         self.ensure_one()

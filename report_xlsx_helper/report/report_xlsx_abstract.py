@@ -102,7 +102,7 @@ class ReportXlsxAbstract(models.AbstractModel):
         border = {"border": True, "border_color": border_grey}
         theader = dict(border, bold=True)
         bg_yellow = "#FFFFCC"
-        bg_blue = "#CCFFFF"
+        bg_blue = "#E4E7E7"
         num_format = "#,##0.00"
         num_format_conditional = "{0};[Red]-{0};{0}".format(num_format)
         pct_format = "#,##0.00%"

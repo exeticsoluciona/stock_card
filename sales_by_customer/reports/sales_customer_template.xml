@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template
+            id="assets_backend"
+            name="stock_card_report assets"
+            inherit_id="web.assets_backend"
+    >
+        <xpath expr="." position="inside">
+            <link
+                    href="/sales_by_customer/static/src/css/report.css"
+                    rel="stylesheet"
+            />
+            <script
+                    type="text/javascript"
+                    src="/sales_by_customer/static/src/js/sales_customer_report_backend.js"
+            />
+            <script
+                    type="text/javascript"
+                    src="/sales_by_customer/static/src/js/product_inventory_report_backend.js"
+            />
+        </xpath>
+    </template>
+
+
+    <template id="report_stock_card_report_base">
+        <div class="page">
+            <div class="row mt16 mb16">
+                <div class="col-md-12" >
+                    <strong><h3><span>REPORTE DE VENTAS POR CLIENTE</span></h3></strong>
+                </div>
+                <div class="col-md-12">
+                    <strong><span>DE LA FECHA  ' </span><t t-esc="o.start_date.strftime('%d/%m/%Y')"></t></strong>
+                    <span style="font-color: #fff !important;">___</span>
+                    <strong><span>A LA FECHA  ' </span><t t-esc="o.end_date.strftime('%d/%m/%Y')"></t></strong>
+                </div>
+            </div>
+            <div class="row">
+                <table class="mb16 table table-striped table-sm ">
+                    <thead>
+                        <th>NOMBRE DEL CLIENTE</th>
+                        <th>TOTAL CON IVA</th>
+                        <th>TOTAL SIN IVA</th>
+                        <th>COSTO</th>
+                        <th>CONTRIBUCIÓN</th>
+                        <th>%</th>
+                    </thead>
+                    <tbody style="text-align: right;">
+                        <t t-foreach="o.liners_ids" t-as="line">
+                            <tr>
+                                <td style="text-align: left !important;"><t t-esc="line.partner"/></td>
+                                <td><t t-esc="line.total_with_tax"/></td>
+                                <td><t t-esc="line.total_without_tax"/></td>
+                                <td><t t-esc="line.cost"/></td>
+                                <td><t t-esc="line.contribution"/></td>
+                                <td><t t-esc="line.percentage"/></td>
+                            </tr>
+                        </t>
+                        <tr style="font-weight: bold !important;">
+                                <td>TOTAL</td>
+                                <td><t t-esc="'{:,.2f}'.format(o.grandtotal_with_tax)"/></td>
+                                <td><t t-esc="'{:,.2f}'.format(o.grandtotal_without_tax)"/></td>
+                                <td><span>---</span></td>
+                                <td><t t-esc="'{:,.2f}'.format(o.grandtotal_with_contribution)"/></td>
+                                <td><span>---</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </template>
+
+    <template id="report_sales_customer_report_html">
+        <div class="o_stock_card_reports_page">
+            <t t-call="sales_by_customer.report_stock_card_report_base"/>
+        </div>
+    </template>
+
+</odoo>

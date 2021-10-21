@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="report_product_inventory_base">
+        <div class="page">
+            <div class="row">
+                <div class="col-2"></div>
+                <div class="col-8">
+                    <table class="mb16 table table-striped table-sm ">
+                    <thead>
+                        <tr class="text-center">
+                            <th colspan="8"><h3>INVENTARIO DE PRODUCTOS</h3></th>
+                        </tr>
+                        <!--<tr class="text-center">
+                            <th>UBICACIONES</th>
+                            <th>CATEGORÍAS</th>
+                        </tr>-->
+                    </thead>
+                    <tbody>
+                        <t>
+                            <!--<tr>
+                                <td><t t-esc="o.location_id.name"/></td>
+                                <td><t t-esc="list_cated_ids"/></td>
+                            </tr>-->
+                        </t>
+                    </tbody>
+                </table>
+                </div>
+                <div class="col-2"></div>
+            </div>
+            <div class="row">
+                <table class="mb16 table table-striped table-sm ">
+                    <thead>
+                        <th>CODIGO</th>
+                        <th>CATEGORIA</th>
+                        <th>NOMBRE DEL PRODUCTO</th>
+                        <th>NÚMERO DE LOTE</th>
+                        <th>PRECIO DE VENTA</th>
+                        <th>COSTO UNITARIO</th>
+                        <th>CANTIDAD ACTUAL</th>
+                        <th>CANTIDAD PREVISTA</th>
+                        <th>UNIDAD DE MEDIDA</th>
+                    </thead>
+                    <tbody style="text-align: right;">
+                        <t t-foreach="o.inventory_liners_ids" t-as="line">
+                            <!--<t t-raw="translate_doc(doc_id, doc_model,
+'user_id.lang', 'report.product.inventory.report')"/>-->
+                            <tr>
+                                <td style="text-align: left !important;"><t t-esc="line.default_code"/></td>
+                                <td style="text-align: left !important;"><t t-esc="line.categ_id"/></td>
+                                <td style="text-align: left !important;"><t t-esc="line.product_id"/></td>
+                                <td style="text-align: left !important;"><t t-esc="line.lot_id"/></td>
+                                <td><t t-esc="line.lst_price"/></td>
+                                <td><t t-esc="line.standard_price"/></td>
+                                <td><t t-esc="line.quantity"/></td>
+                                <td><t t-esc="line.forecast"/></td>
+                                <td><t t-esc="line.uom_id"/></td>
+                            </tr>
+
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </template>
+
+    <template id="report_product_inventory_report_html">
+        <div class="o_stock_card_reports_page">
+            <t t-call="sales_by_customer.report_product_inventory_base"/>
+        </div>
+    </template>
+</odoo>

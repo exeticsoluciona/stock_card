@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="action_report_product_inventory_html" model="ir.actions.client">
+        <field name="name">Product Inventory Report</field>
+        <field name="tag">product_inventory_report_backend</field>
+        <field name="context" eval="{'active_model': 'report.product.inventory.report'}" />
+    </record>
+
+    <record id="view_product_inventory_wizard_form" model="ir.ui.view">
+        <field name="name">product.inventory.wizard.form</field>
+        <field name="model">product.inventory.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="location_id" required="1"/>
+                        </group>
+                        <group>
+                            <field name="categ_ids" widget="many2many_tags" required="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="name" invisible="1"/>
+                        <field name="archivo" readonly="1" filename="name"/>
+                    </group>
+                    <group>
+                        <footer>
+                            <button
+                        name="button_export_html"
+                        string="View"
+                        type="object"
+                        default_focus="1"
+                        class="oe_highlight"
+                    />
+                            or
+                            <button name="print_report_excel" string="Reporte excel" type="object" class="oe_highlight"/>
+                            or
+                            <button string="Close" class="btn-default" special="cancel"/>
+                        </footer>
+                    </group>
+                </sheet>
+
+            </form>
+        </field>
+    </record>
+
+    <record id="window_product_inventory_action" model="ir.actions.act_window">
+        <field name="name">Product Inventory Report</field>
+        <field name="res_model">product.inventory.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+<!--    <act_window id="window_sales_customer" name="Sales Customer Report" res_model="sales.customer.wizard"-->
+<!--                src_model="sale.order" view_mode="form" target="new"/>-->
+    <menuitem action="window_product_inventory_action" id="menu_product_inventory" parent="stock.menu_warehouse_report"/>
+
+</odoo>

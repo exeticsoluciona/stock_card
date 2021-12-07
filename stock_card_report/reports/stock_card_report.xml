@@ -99,6 +99,12 @@
                     </div>
                     <!-- Display each lines -->
                     <t t-set="product_balance" t-value="initial" />
+                    <t t-set="total_eup_entradas" t-value="0" />
+                    <t t-set="total_eup_salidas" t-value="0" />
+                    <t t-set="total_eup_soldo" t-value="0" />
+                    <t t-set="total_eus_entradas" t-value="0" />
+                    <t t-set="total_eus_salidas" t-value="0" />
+                    <t t-set="total_eus_soldo" t-value="0" />
                     <t
                         t-foreach="o.results.filtered(lambda l: l.product_id == product and not l.is_initial)"
                         t-as="product_line"
@@ -107,20 +113,62 @@
                             t-set="product_balance"
                             t-value="product_balance + product_line.product_in - product_line.product_out"
                         />
+                        <t t-set="total_eup_entradas" t-value="total_eup_entradas + product_line.product_in"/>
+                        <t t-set="total_eup_salidas" t-value="total_eup_salidas + product_line.product_out"/>
+                        <t t-set="total_eup_soldo" t-value="total_eup_soldo + product_line.product_in - product_line.product_out"/>
+                        <t t-set="total_eus_entradas" t-value="product.uom_id._compute_quantity(total_eup_entradas, product.sh_secondary_uom)"/>
+                        <t t-set="total_eus_salidas" t-value="product.uom_id._compute_quantity(total_eup_salidas, product.sh_secondary_uom)"/>
+                        <t t-set="total_eus_soldo" t-value="product.uom_id._compute_quantity(total_eup_soldo, product.sh_secondary_uom)"/>
                         <t t-call="stock_card_report.report_stock_card_lines" />
                     </t>
+                    <!--total amount-->
+                    <t t-call="stock_card_report.report_stock_card_total" />
+                    <!--Display total value-->
                 </div>
                 <p style="page-break-before:always;" />
             </div>
         </t>
     </template>
 
+    <template id="stock_card_report.report_stock_card_total">
+        <div class="act_as_thead">
+            <div class="act_as_row labels">
+                <div class="act_as_cell"></div>
+                <div class="act_as_cell">TOTAL EN UDM Principal</div>
+                <div class="act_as_cell"></div>
+                <div class="act_as_cell right"><t t-esc="'{0:,.2f}'.format(total_eup_entradas)"/></div>
+                <div class="act_as_cell right"><t t-esc="'{0:,.2f}'.format(total_eup_salidas)"/></div>
+                <div class="act_as_cell right"><t t-esc="'{0:,.2f}'.format(total_eup_soldo)"/></div>
+            </div>
+        </div>
+        <div class="act_as_thead">
+            <div class="act_as_row labels">
+                <div class="act_as_cell right"></div>
+                <div class="act_as_cell">TOTAL EN UDM Secundaria</div>
+                <div class="act_as_cell"></div>
+                <div class="act_as_cell right"><t t-esc="'{0:,.2f}'.format(total_eus_entradas)"/></div>
+                <div class="act_as_cell right"><t t-esc="'{0:,.2f}'.format(total_eus_salidas)"/></div>
+                <div class="act_as_cell right"><t t-esc="'{0:,.2f}'.format(total_eus_soldo)"/></div>
+            </div>
+        </div>
+    </template>
+
+
     <template id="stock_card_report.report_stock_card_report_filters">
         <div class="act_as_table data_table" style="width: 100%;">
+            <t t-set="total_average" t-value="0" />
+            <t t-set="counter" t-value="0"/>
+            <t t-foreach="o.results.filtered(lambda l: l.product_id == product and not l.is_initial)" t-as="product_line">
+                <t t-set="total_average" t-value="total_average + float('{0:,.2f}'.format(o._get_nearest_standard_price(product,product_line.date)))"/>
+                    <t t-set="counter" t-value="counter+1"/>
+            </t>
             <div class="act_as_row labels">
                 <div class="act_as_cell">De la fecha</div>
                 <div class="act_as_cell">A la fecha</div>
                 <div class="act_as_cell">Ubicación</div>
+                <div class="act_as_cell">UDM Principal</div>
+                <div class="act_as_cell">UDM Secundaria</div>
+                <div class="act_as_cell">Costo promedio / Kardex</div>
             </div>
             <div class="act_as_row">
                 <div class="act_as_cell">
@@ -133,6 +181,16 @@
                 </div>
                 <div class="act_as_cell">
                     <span t-field="o.location_id" />
+                </div>
+                <div class="act_as_cell">
+                    <span t-field="product.uom_id.name" />
+                </div>
+                <div class="act_as_cell">
+                    <span t-field="product.sh_secondary_uom.name" />
+                </div>
+                <div class="act_as_cell">
+                    <span t-esc="'{0:,.2f}'.format(float(total_average)/counter)"/>
+<!--                    <span t-field="product.sh_secundary_uom.name" />-->
                 </div>
             </div>
         </div>

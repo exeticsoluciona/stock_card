@@ -37,10 +37,14 @@
                         <th>PRECIO DE VENTA</th>
                         <th>COSTO UNITARIO</th>
                         <th>CANTIDAD ACTUAL</th>
-                        <th>CANTIDAD PREVISTA</th>
+                        <th>EXISTENCIA PREVISTA</th>
                         <th>UNIDAD DE MEDIDA</th>
+                        <th>UDM SECUNDARIA</th>
+                        <th>EXISTENCIA ACTUAL EN UDM SECUNDARIA</th>
+                        <th>COSTO TOTAL</th>
                     </thead>
                     <tbody style="text-align: right;">
+                        <t t-set="total_cost" t-value="0"/>
                         <t t-foreach="o.inventory_liners_ids" t-as="line">
                             <!--<t t-raw="translate_doc(doc_id, doc_model,
 'user_id.lang', 'report.product.inventory.report')"/>-->
@@ -54,9 +58,17 @@
                                 <td><t t-esc="line.quantity"/></td>
                                 <td><t t-esc="line.forecast"/></td>
                                 <td><t t-esc="line.uom_id"/></td>
+                                <td><t t-esc="line.sh_secondary_uom"/></td>
+                                <td><t t-esc="line.current_udm"/></td>
+                                <td><t t-esc="line.costo_total"/>
+                                <t t-set="total_cost" t-value="total_cost + float(line.costo_total)"/></td>
                             </tr>
-
                         </t>
+                        <tr>
+                                <td colspan="10"></td>
+                                <td colspan="1"><strong>COSTO TOTAL</strong></td>
+                                <td colspan="1"><strong><t t-esc="'{0:,.2f}'.format(total_cost)"/></strong></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

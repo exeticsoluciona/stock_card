@@ -12,6 +12,9 @@ class InventoryLiners(models.TransientModel):
     quantity = fields.Char(string="quantity")
     forecast = fields.Char(string="forecast")
     uom_id = fields.Char(string="uom")
+    sh_secondary_uom = fields.Char(string="second uom")
+    current_udm = fields.Char(string="second uom")
+    costo_total = fields.Char(string="Costo Total")
 
 class ProductTotalQty(models.TransientModel):
     _name = 'product.total.qty'
@@ -45,6 +48,7 @@ class ReportProductInventory(models.TransientModel):
         total_categ_on_hand = {}
         if quant_ids:
             for quant in quant_ids:
+                second_uom = quant.product_id.sh_secondary_uom or quant.product_id.uom_id
                 if quant.product_id.active and quant.product_id.categ_id.id in list_cated_ids:
                     if quant.product_id.categ_id.name in categ_dic:
                         # append the new number to the existing array at this slot
@@ -56,8 +60,11 @@ class ReportProductInventory(models.TransientModel):
                             'lot_id': quant.lot_id.name or '',
                             'standard_price': "{:.2f}".format(quant.product_id.standard_price),
                             'quantity': "{:.2f}".format(quant.quantity),
-                            'forecast': "{:.2f}".format(quant.product_tmpl_id.virtual_available,),
+                            'forecast': "{:.2f}".format(quant.product_tmpl_id.virtual_available),
                             'uom_id': quant.product_id.uom_id.name,
+                            'sh_secondary_uom': quant.product_id.sh_secondary_uom.name or '---',
+                            'current_udm': "{:.2f}".format(quant.product_uom_id._compute_quantity(quant.quantity, second_uom)),
+                            'costo_total': "{:.2f}".format(quant.product_id.standard_price * quant.quantity),
                         })
                     else:
                         # create a new array in this slot
@@ -71,12 +78,17 @@ class ReportProductInventory(models.TransientModel):
                             'quantity': "{:.2f}".format(quant.quantity),
                             'forecast': "{:.2f}".format(quant.product_tmpl_id.virtual_available,),
                             'uom_id': quant.product_id.uom_id.name,
+                            'sh_secondary_uom': quant.product_id.sh_secondary_uom.name,
+                            'current_udm': "{:.2f}".format(quant.product_uom_id._compute_quantity(quant.quantity, second_uom)),
+                            'costo_total': "{:.2f}".format(quant.product_id.standard_price * quant.quantity),
                         }]
         total_qty_on_hand = {}
+        total_costo = 0.0
         for categ in categ_dic.values():
             total_on_hand = 0
             for line in categ:
                 total_on_hand += float(line.get('quantity'))
+                total_costo += float(line.get('costo_total'))
                 total_qty_on_hand.update({
                     line.get('categ_id') : total_on_hand,
                 })

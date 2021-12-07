@@ -12,7 +12,7 @@
     'website': "https://www.exeticsoluciona.com",
 
     'category': 'Custom',
-    'version': '13.0.0.8',
+    'version': '13.0.0.9',
 
     'depends': ['sale_management', "stock"],
 

@@ -61,7 +61,7 @@ class ProductInventoryWizard(models.TransientModel):
             format6 = libro.add_format({'font_size': 10, 'align': 'right', 'num_format': '#,##0.00'})
             format7 = libro.add_format({'font_size': 10, 'align': 'right', 'num_format': 'dd/mm/yy'})
 
-            hoja.merge_range('A' + str(y + 1) + ':' + 'H' + str(y + 1), 'REPORTE DE INVENTARIO',format4)
+            hoja.merge_range('A' + str(y + 1) + ':' + 'L' + str(y + 1), 'REPORTE DE INVENTARIO',format4)
 #            y+=1
 #            hoja.merge_range('A' + str(y + 1) + ':' + 'B' + str(y + 1), 'FECHA INICIAL',format5)
 #            hoja.merge_range('C' + str(y + 1) + ':' + 'D' + str(y + 1), '',format5)
@@ -79,19 +79,17 @@ class ProductInventoryWizard(models.TransientModel):
             hoja.merge_range('G' + str(y + 1) + ':' + 'H' + str(y + 1), categ_name, format5)
             y+=1
 
-            format2 = libro.add_format({'font_size': 10, 'align': 'center', 'bold': True, 'bg_color': '#D3D3D3'})
+            format2 = libro.add_format({'font_size': 8, 'align': 'distributed', 'bold': True, 'bg_color': '#D3D3D3'})
             format1 = libro.add_format({'font_size': 12, 'align': 'center', 'bold': True, 'bg_color': '#D3D3D3'})
 
-            hoja.set_column(y, 0, 8)
-            hoja.set_column(y, 1, 15)
-            hoja.set_column(y, 2, 21)
-            hoja.set_column(y, 3, 9)
-            hoja.set_column(y, 4, 9)
-            hoja.set_column(y, 5, 9)
-            hoja.set_column(y, 6, 9)
-            hoja.set_column(y, 7, 9)
-            hoja.set_column(y, 8, 9)
-            hoja.set_row(3, 25)
+            hoja.set_column(0, 0, 10)
+            hoja.set_column(1, 1, 25)
+            hoja.set_column(2, 2, 40)
+            hoja.set_column(3, 3, 20)
+            hoja.set_column(4, 9, 10)
+            hoja.set_column(10, 10, 13)
+            hoja.set_column(11, 11, 10)
+            hoja.set_row(3, 30)
 
             hoja.write(y, 0, 'CODIGO',format2)
             hoja.write(y, 1, 'CATEGORIA',format2)
@@ -102,15 +100,20 @@ class ProductInventoryWizard(models.TransientModel):
             hoja.write(y, 6, 'EXISTENCIA ACTUAL', format2)
             hoja.write(y, 7, 'EXISTENCIA PREVISTA', format2)
             hoja.write(y, 8, 'UNIDAD DE MEDIDA', format2)
-
-
+            hoja.write(y, 9, 'UDM SECUNDARIA', format2)
+            hoja.write(y, 10, 'EXISTENCIA ACTUAL EN UDM SECUNDARIA', format2)
+            hoja.write(y, 11, 'COSTO TOTAL', format2)
 
             y += 1
             quant_ids = self.env['stock.quant'].search([('location_id','=',w['location_id'].id)],order='product_id asc')
 
+
+
+
             categ_dic = {}
             if quant_ids:
                 for quant in quant_ids:
+                    second_uom = quant.product_id.sh_secondary_uom or quant.product_id.uom_id
                     if quant.product_id.active and quant.product_id.categ_id.id in list_cated_ids :
                         if quant.product_id.categ_id.name in categ_dic:
                             # append the new number to the existing array at this slot
@@ -124,7 +127,12 @@ class ProductInventoryWizard(models.TransientModel):
                                 'quantity': "{:.2f}".format(quant.quantity),
                                 'forecast': "{:.2f}".format(quant.product_tmpl_id.virtual_available,),
                                 'uom_id': quant.product_id.uom_id.name,
+                                'second_uom_id': quant.product_id.sh_secondary_uom.name or '---',
+                                'current_udm': "{:.2f}".format(quant.product_uom_id._compute_quantity(quant.quantity, second_uom)),
+                                'costo_total': "{:.2f}".format(quant.product_id.standard_price * quant.quantity),
                             })
+
+
                         else:
                             # create a new array in this slot
                             categ_dic[quant.product_id.categ_id.name] = [{
@@ -135,15 +143,20 @@ class ProductInventoryWizard(models.TransientModel):
                                 'lst_price': "{:.2f}".format(quant.product_id.lst_price),
                                 'standard_price': "{:.2f}".format(quant.product_id.standard_price),
                                 'quantity': "{:.2f}".format(quant.quantity),
-                                'forecast': "{:.2f}".format(quant.product_tmpl_id.virtual_available,),
+                                'forecast': "{:.2f}".format(quant.product_tmpl_id.virtual_available),
                                 'uom_id': quant.product_id.uom_id.name,
+                                'second_uom_id': quant.product_id.sh_secondary_uom.name or quant.product_id.uom_id.name or '---',
+                                'current_udm': "{:.2f}".format(quant.product_uom_id._compute_quantity(quant.quantity, second_uom)),
+                                'costo_total': "{:.2f}".format(quant.product_id.standard_price * quant.quantity),
                             }]
             total_qty_on_hand = {}
+            total_costo = 0.0
             for categ in categ_dic.values():
-                total_on_hand = 0
+                total_on_hand = 0.0
                 for line in categ:
                     print("111111",line)
                     total_on_hand += float(line.get('quantity'))
+                    total_costo += float(line.get('costo_total'))
                     total_qty_on_hand.update({
                         line.get('categ_id'): total_on_hand,
                     })
@@ -156,8 +169,12 @@ class ProductInventoryWizard(models.TransientModel):
                     hoja.write(y, 6, line.get('quantity'),format6)
                     hoja.write(y, 7, line.get('forecast'),format6)
                     hoja.write(y, 8, line.get('uom_id'))
+                    hoja.write(y, 9, line.get('second_uom_id'))
+                    hoja.write(y, 10, line.get('current_udm'),format6)
+                    hoja.write(y, 11, line.get('costo_total'),format6)
                     y += 1
-
+            hoja.write(y, 10, 'COSTO TOTAL')
+            hoja.write(y, 11, total_costo)
 #            y += 3
 #            hoja.merge_range('C'+str(y+1) + ':' + 'D'+ str(y+1), 'SUMMARY BY PRODUCT CATEGORY',format1)
 #            y += 1
